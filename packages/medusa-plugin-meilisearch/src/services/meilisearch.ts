@@ -44,7 +44,7 @@ class MeiliSearchService extends SearchUtils.AbstractSearchService {
   }
 
   async addDocuments(indexName: string, documents: any, type: string) {
-    const transformedDocuments = this.getTransformedDocuments(type, documents)
+    const transformedDocuments = await this.getTransformedDocuments(type, documents)
 
     return await this.client_
       .index(indexName)
@@ -52,7 +52,7 @@ class MeiliSearchService extends SearchUtils.AbstractSearchService {
   }
 
   async replaceDocuments(indexName: string, documents: any, type: string) {
-    const transformedDocuments = this.getTransformedDocuments(type, documents)
+    const transformedDocuments = await this.getTransformedDocuments(type, documents)
 
     return await this.client_
       .index(indexName)
@@ -99,7 +99,7 @@ class MeiliSearchService extends SearchUtils.AbstractSearchService {
     }
   }
 
-  getTransformedDocuments(type: string, documents: any[]) {
+  async getTransformedDocuments(type: string, documents: any[]) {
     if (!documents?.length) {
       return []
     }
@@ -110,7 +110,7 @@ class MeiliSearchService extends SearchUtils.AbstractSearchService {
           this.config_.settings?.[SearchTypes.indexTypes.PRODUCTS]
             ?.transformer ?? transformProduct
 
-        return documents.map(productsTransformer)
+        return await Promise.all(documents.map(productsTransformer))
       default:
         return documents
     }
